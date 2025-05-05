@@ -13,14 +13,14 @@ local function downloadFile(config, file)
 	end
 end
 
-local config = fs.exists("/lib/YL/config.lua") and require("lib.yl.config") or {
+local config = fs.exists("/lib/YL/config.lua") and require("/lib/YL/config") or {
 	repo = "https://raw.githubusercontent.com/slink7/YL/master/",
 	basePath = "/lib/YL/",
 }
 
 downloadFile(config, "config.lua")
 
-config = require("lib.yl.config")
+config = require("/lib/YL/config")
 
 for _, mod in ipairs(config.modules) do
 	downloadFile(config, mod .. ".lua")
