@@ -30,3 +30,11 @@ downloadFile(config, "init.lua")
 downloadFile(config, "update.lua")
 
 print("YL library updated to version: " .. config.version)
+
+local currentScript = shell.getRunningProgram()
+local isInstaller = currentScript ~= fs.combine(config.basePath, "update.lua")
+
+if isInstaller then
+    print("The file will autodestroy now...")
+    fs.delete(currentScript)
+end
