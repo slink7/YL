@@ -104,7 +104,7 @@ end
 ]]
 function crypto.signRSA(message, exponent, modulus)
 	local h = crypto.hash(message, modulus)
-	local signature = modExp(h, exponent, modulus)
+	local signature = crypto.modExp(h, exponent, modulus)
 	return signature
 end
 
@@ -148,7 +148,7 @@ as the private key
 function crypto.decryptMessage(crypt, exponent, modulus)
 	local plainNums = {}
 	for _, c in ipairs(crypt) do
-		table.insert(plainNums, modExp(c, exponent, modulus))
+		table.insert(plainNums, crypto.modExp(c, exponent, modulus))
 	end
 	return numsToStr(plainNums)
 end
@@ -160,7 +160,7 @@ end
 ]]
 function crypto.verifyRSA(message, signature, exponent, modulus)
 	local h = crypto.hash(message, modulus)
-	local h2 = modExp(signature, exponent, modulus)
+	local h2 = crypto.modExp(signature, exponent, modulus)
 	return h2 == h
 end
 
