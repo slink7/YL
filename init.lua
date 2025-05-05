@@ -1,8 +1,8 @@
 local YL = {}
-local config = require("yl.config")
+local config = require("lib.yl.config")
 
-for m in modules do
-	YL[m] = require("yl."..m)
+for key, mod in ipairs(config.modules) do
+	YL[mod] = require("lib.yl."..mod)
 end
 
 return YL
