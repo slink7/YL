@@ -13,6 +13,9 @@ end
 local function numsToStr(nums)
 	local chars = {}
 	for i = 1, #nums do
+		if nums[i] < 0 or nums[i] > 255 then
+			return ""
+		end
 		chars[i] = string.char(nums[i])
 	end
 	return table.concat(chars)
@@ -148,6 +151,9 @@ as the private key
 function crypto.decryptMessage(crypt, exponent, modulus)
 	local plainNums = {}
 	for _, c in ipairs(crypt) do
+		if type(c) ~= "number" then
+			return ""
+		end
 		table.insert(plainNums, crypto.modExp(c, exponent, modulus))
 	end
 	return numsToStr(plainNums)
@@ -180,18 +186,25 @@ function crypto.receiveSecure(timeout)
 	  return nil, "No message received"
 	end
 
+	if type(ciphertext) ~= "table" then
+		return nil, "Error in message type"
+	end
+
 	local message = crypto.decryptMessage(ciphertext, self_rsa.private_exponent, self_rsa.modulus)
 	local received_table = textutils.unserialize(message)
+	if not received_table then
+		return nil, "Error in message"
+	end
 	received_table.id = id
+	received_table.validSignature = false
 	
 	local other_rsa = files.readTable("rsa/others/"..received_table.username..".txt")
 	if not other_rsa then
-		received_table.validSignature = false
 		return received_table, "No rsa data for "..received_table.username
 	end
 
 	received_table.validSignature = crypto.verifyRSA(received_table.message, received_table.signature, other_rsa.public_exponent, other_rsa.modulus)
-	return received_table
+	return received_table, "OK"
 end
 
 return crypto
