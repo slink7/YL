@@ -6,18 +6,18 @@ grp.GROUP_DIR = "/groups/"
 grp.SUCCESS = "Done"
 
 local function isOwner(group, user)
-	return grp.owner == user
+	return group.owner == user
 end
 
 local function isAdmin(group, user)
-	for admin in grp.admin do
+	for _, admin in pairs(group.admin) do
 		if admin == user then return true end
 	end
 	return false
 end
 
 local function isMember(group, user)
-	for member in grp.member do
+	for _, member in pairs(group.member) do
 		if member == user then return true end
 	end
 	return false
@@ -53,7 +53,7 @@ function grp.delete(initiator, group)
 	local group_path = grp.GROUP_DIR..group
 	local group = files.readTable(group_path)
 	if not group then return false, "Group doesn't exist" end
-	if grp.owner ~= initiator then return false, "Not allowed" end
+	if group.owner ~= initiator then return false, "Not allowed" end
 	fs.delete(group_path)
 	return true, grp.SUCCESS
 end
@@ -64,7 +64,7 @@ function grp.add(initiator, group, user)
 	if not group then return false, "Group doesn't exist" end
 	local level = getLevel(group, initiator)
 	if level <= 1 then return false, "Not allowed" end
-	table.insert(grp.member, user)
+	table.insert(group.member, user)
 	files.writeTable(group_path, group)
 	return true, grp.SUCCESS
 end
@@ -75,7 +75,7 @@ function grp.remove(initiator, group, user)
 	if not group then return false, "Group doesn't exist" end
 	local level = getLevel(group, initiator)
 	if level <= 1 then return false, "Not allowed" end
-	grp.member[user] = nil
+	group.member[user] = nil
 	files.writeTable(group_path, group)
 	return true, grp.SUCCESS
 end
@@ -86,8 +86,8 @@ function grp.promote(initiator, group, user)
 	if not group then return false, "Group doesn't exist" end
 	local level = getLevel(group, initiator)
 	if level <= 1 then return false, "Not allowed" end
-	table.insert(grp.admin, user)
-	grp.member[user] = nil
+	table.insert(group.admin, user)
+	group.member[user] = nil
 	files.writeTable(group_path, group)
 	return true, grp.SUCCESS
 end
@@ -100,11 +100,10 @@ function grp.demote(initiator, group, user)
 	local level = getLevel(group, initiator)
 	if level <= 1 then return false, "Not allowed" end
 	if not isAdmin(group, user) then return false, "Not an admin" end
-	table.insert(grp.member, user)
-	grp.admin[user] = nil
+	table.insert(group.member, user)
+	group.admin[user] = nil
 	files.writeTable(group_path, group)
 	return true, grp.SUCCESS
 end
 
-
-return group
+return grp

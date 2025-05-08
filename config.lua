@@ -1,6 +1,6 @@
 return {
 	name = "YL",
-	version = 1,
+	version = 2,
 	repo = "https://raw.githubusercontent.com/slink7/YL/master/",
 	basePath = "/lib/YL/",
 	modules = {
