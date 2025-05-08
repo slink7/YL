@@ -7,5 +7,6 @@ return {
 		"crypto",
 		"utils",
 		"files",
+		"group",
 	}
 }
