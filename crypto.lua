@@ -39,6 +39,7 @@ end
 	returns a trivial hash of the message
 ]]
 function crypto.hash(message, modulus)
+	message = message or ""
 	local out = 0xABCDEF
 	for k = 1, #message do
 		out = bit.bxor(out, string.byte(message, k) * 16777619)
