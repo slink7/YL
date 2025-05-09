@@ -31,6 +31,7 @@ local function getLevel(group, user)
 end
 
 function grp.getUserLevel(initiator, group, user)
+	user = user or initiator
 	local group_path = grp.GROUP_DIR..group
 	local group = files.readTable(group_path)
 	if not group then return -1, "Group doesn't exist" end
@@ -40,12 +41,12 @@ end
 function grp.create(initiator, group)
 	local group_path = grp.GROUP_DIR..group
 	if fs.exists(group_path) then return false, "Group already exists" end
-	local group = {
+	local towrite = {
 		owner = initiator,
 		admin = {},
 		member = {}
 	}
-	files.writeTable(group_path, group)
+	files.writeTable(group_path, towrite)
 	return true, grp.SUCCESS
 end
 
@@ -104,6 +105,24 @@ function grp.demote(initiator, group, user)
 	group.admin[user] = nil
 	files.writeTable(group_path, group)
 	return true, grp.SUCCESS
+end
+
+function grp.list(initiator, group)
+	if not group then
+		local groups = fs.list(grp.GROUP_DIR)
+		return true, textutils.serialize(groups)
+	end
+	
+	local group_path = grp.GROUP_DIR..group
+	local group_data = files.readTable(group_path)
+	if not group_data then return false, "Group doesn't exist" end
+
+	local members = {
+		owner = group_data.owner,
+		admins = group_data.admin,
+		members = group_data.member
+	}
+	return true, textutils.serialize(members)
 end
 
 return grp
