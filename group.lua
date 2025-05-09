@@ -76,7 +76,23 @@ function grp.remove(initiator, group, user)
 	if not group then return false, "Group doesn't exist" end
 	local level = getLevel(group, initiator)
 	if level <= 1 then return false, "Not allowed" end
-	group.member[user] = nil
+	if isAdmin(group, user) then
+		for i, admin in ipairs(group.admin) do
+			if admin == user then
+				table.remove(group.admin, i)
+				break
+			end
+		end
+	elseif isMember(group, user) then
+		for i, member in ipairs(group.member) do
+			if member == user then
+				table.remove(group.member, i)
+				break
+			end
+		end
+	else
+		return false, "User is not part of the group"
+	end
 	files.writeTable(group_path, group)
 	return true, grp.SUCCESS
 end
